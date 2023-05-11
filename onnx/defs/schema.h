@@ -1195,23 +1195,22 @@ class OpSchemaRegistry final : public ISchemaRegistry {
     }
   };
 
-    // Deregister all ONNX schemas
-    static void OpSchemaDeregisterAll() {
-        auto& m = GetMapWithoutEnsuringRegistration();
-
-        // Map stores operator schemas in the format of
-        // <OpName, <Domain, <OperatorSetVersion, OpSchema>>>
-        // .clear() invalidates mapped elements bottom-up and (DEBUG) frees memory
-        for (auto&& m_p : m) {
-            auto& domain_map = m_p.second;
-            for (auto&& domain_map_p : domain_map) {
-                auto& opset_version_schema_map = domain_map_p.second;
-                opset_version_schema_map.clear();
-            }
-            domain_map.clear();
-        }
-        m.clear();
+  // Deregister all opset schemas from domain
+  // Domain with default value ONNX_DOMAIN means ONNX.
+  static void OpSchemaDeregisterAll(const std::string& domain = ONNX_DOMAIN) {
+    auto& m = GetMapWithoutEnsuringRegistration();
+    // Map stores operator schemas in the format of
+    // <OpName, <Domain, <OperatorSetVersion, OpSchema>>>
+    // .clear() invalidates mapped elements bottom-up and frees memory
+    for (auto&& m_p : m) {
+      auto& domain_map = m_p.second;
+      if (domain_map.count(domain)) {
+        auto& opset_version_schema_map = domain_map[domain];
+        opset_version_schema_map.clear();
+        domain_map.erase(domain);
+      }
     }
+  }
 
   // Return the latest schema for an operator in specified domain.
   // Domain with default value ONNX_DOMAIN means ONNX.

@@ -51,6 +51,7 @@ TEST(SchemaRegistrationTest, RegisterSpecifiedOpsetSchemaVersion) {
 }
 
 TEST(SchemaRegistrationTest, ReregisterSpecifiedOpsetSchemaVersion) {
+#ifdef __ONNX_DISABLE_STATIC_REGISTRATION
   EXPECT_TRUE(OpSchemaRegistry::Instance()->GetLoadedSchemaVersion() == -1);
   // Opset 13 was previously registered and cleared
   // Reregister opset 7
@@ -58,7 +59,7 @@ TEST(SchemaRegistrationTest, ReregisterSpecifiedOpsetSchemaVersion) {
   EXPECT_TRUE(OpSchemaRegistry::Instance()->GetLoadedSchemaVersion() == 7);
 
   // Should find opset 7
-  opSchema = OpSchemaRegistry::Schema("Add");
+  auto opSchema = OpSchemaRegistry::Schema("Add");
   EXPECT_NE(nullptr, opSchema);
   EXPECT_EQ(opSchema->SinceVersion(), 7);
 
@@ -74,6 +75,7 @@ TEST(SchemaRegistrationTest, ReregisterSpecifiedOpsetSchemaVersion) {
   opSchema = OpSchemaRegistry::Schema("Abs");
   EXPECT_NE(nullptr, opSchema);
   EXPECT_EQ(opSchema->SinceVersion(), 6);
+#endif
 }
 
 } // namespace Test
