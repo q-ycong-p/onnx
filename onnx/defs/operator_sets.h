@@ -1164,4 +1164,10 @@ inline void RegisterOnnxOperatorSetSchema(int target_version) {
   OpSchemaRegistry::Instance()->SetLoadedSchemaVersion(target_version);
 }
 
+inline void DeregisterOnnxOperatorSetSchema() {
+    OpSchemaRegistry::Instance()->OpSchemaDeregisterAll();
+    // -1 means no ONNX schema is loaded
+    OpSchemaRegistry::Instance()->SetLoadedSchemaVersion(-1);
+}
+
 } // namespace ONNX_NAMESPACE
